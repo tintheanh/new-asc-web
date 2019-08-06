@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import * as React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Home, Login, Appointment, BookAppointment, SingleViewAppointment, NotFound } from './components/screens';
+import { Nav, PrivateRoute } from './components/common';
+import configureStore from './redux/configureStore';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+	private configureStore: any;
+
+	constructor(props: any) {
+		super(props);
+
+		this.configureStore = configureStore();
+	}
+
+	render() {
+		return (
+			<Provider store={this.configureStore.store}>
+				<PersistGate loading={null} persistor={this.configureStore.persistor}>
+					<BrowserRouter>
+						<Nav />
+						<Switch>
+							<Route exact path="/" component={Home} />
+							<Route exact path="/login" component={Login} />
+							<PrivateRoute exact path="/appointment" component={Appointment} />
+							<PrivateRoute exact path="/appointment/book" component={BookAppointment} />
+							<PrivateRoute exact path="/appointment/book/single-view" component={SingleViewAppointment} />
+							<Route component={NotFound} />
+						</Switch>
+					</BrowserRouter>
+				</PersistGate>
+			</Provider>
+		);
+	}
 }
 
 export default App;
