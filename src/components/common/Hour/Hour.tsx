@@ -2,7 +2,7 @@ import * as React from 'react';
 import Modal from 'react-modal';
 import { connect } from 'react-redux';
 import { floatToTime } from 'utils/functions';
-import AppointmentDetail from '../../../AppointmentDetail/AppointmentDetail';
+import AppointmentDetail from '../AppointmentDetail/AppointmentDetail';
 
 Modal.setAppElement('#root');
 
@@ -16,19 +16,18 @@ class Hour extends React.Component<any, any> {
 
 	checkVacancy = (hr: any) => {
 		const timeString = floatToTime(hr);
-		for (const day of this.props.tutor.work_schedule[this.props.selectedDate.getDay()]) {
+		for (const day of this.props.tutor.work_schedule[this.props.dayOne.getDay()]) {
 			if (day.appointments) {
 				for (const app of day.appointments) {
-					const pickedMonth = this.props.selectedDate.getMonth();
+					const pickedMonth = this.props.dayOne.getMonth();
 					const apptMonth = new Date(app.date * 1000).getMonth();
-					const pickedDate = this.props.selectedDate.getDate();
+					const pickedDate = this.props.dayOne.getDate();
 					const apptDate = new Date(app.date * 1000).getDate();
 					if (timeString === app.from && (pickedMonth === apptMonth && pickedDate === apptDate)) {
 						return false;
 					}
 				}
 			}
-			return true;
 		}
 		return true;
 	};
@@ -52,7 +51,6 @@ class Hour extends React.Component<any, any> {
 
 				<Modal
 					isOpen={this.state.modal}
-					onRequestClose={this.toggleModal('close')}
 					style={{
 						content: {
 							width: '30%',
@@ -61,11 +59,13 @@ class Hour extends React.Component<any, any> {
 						}
 					}}
 				>
-					<AppointmentDetail
-						tutor={this.props.tutor}
-						hour={this.props.hour}
-						close={this.toggleModal('close')}
-					/>
+					{this.state.modal ? (
+						<AppointmentDetail
+							tutor={this.props.tutor}
+							hour={this.props.hour}
+							close={this.toggleModal('close')}
+						/>
+					) : null}
 				</Modal>
 			</div>
 		);
@@ -91,6 +91,6 @@ const styles = {
 	}
 };
 
-const mapStateToProps = (state: any) => ({ selectedDate: state.tutor.data.selectedDate });
+const mapStateToProps = (state: any) => ({ dayOne: state.date.data.dayOne });
 
 export default connect(mapStateToProps, null)(Hour);

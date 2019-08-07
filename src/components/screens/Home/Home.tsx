@@ -14,7 +14,7 @@ class Home extends React.Component<any, any> {
 						<img
 							src={logo}
 							className="thumbnail img-responsive"
-							style={{ margin: '0 auto' }}
+							style={{ margin: '0 auto', marginBottom: 10 }}
 						/>
 						<p className="text-center login-btn-landing">
 							<Link to="/login" className="btn btn-primary">

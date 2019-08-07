@@ -5,6 +5,7 @@ import AuthReducer from './auth/reducer';
 import SubjectReducer from './subject/reducer';
 import TutorReducer from './tutor/reducer';
 import AppointmentReducer from './appointment/reducer';
+import DateReducer from './date/reducer';
 
 const authPersistConfig = {
 	key: 'auth',
@@ -21,7 +22,8 @@ const rootReducer = combineReducers({
 	auth: persistReducer(authPersistConfig, AuthReducer),
 	subject: persistReducer(subjectPersisConfig, SubjectReducer),
 	tutor: TutorReducer,
-	appointment: AppointmentReducer
+	appointment: AppointmentReducer,
+	date: DateReducer
 });
 
 export default rootReducer;

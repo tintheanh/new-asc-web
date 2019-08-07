@@ -41,3 +41,45 @@ export const floatToTime = (float: number) => {
 	}
 	return (hr < 10 ? '0' : '') + hr + ':' + (min < 10 ? '0' : '') + min + ' AM';
 };
+
+export const traverseWeekdays = (d1: number, d2: number, type: boolean) => {
+	const result = [];
+	if (d1 < d2) {
+		for (let i = d1; i <= d2; i++) {
+			result.push(i);
+		}
+	} else if (d1 > d2) {
+		if (d2 !== 0) {
+			for (let i = d1; i !== d2; i++) {
+				if (i === 7) {
+					i = 0;
+				}
+				result.push(i);
+			}
+			result.push(d2);
+		} else {
+			for (let i = d1; i < 7; i++) {
+				result.push(i);
+			}
+			result.push(d2);
+		}
+	} else {
+		if (type) result.push(d1);
+		else {
+			let i = d1;
+
+			while (true) {
+				result.push(i);
+				i++;
+				if (i === 7) {
+					i = 0;
+				}
+				if (i === d2) {
+					break;
+				}
+			}
+		}
+	}
+
+	return result;
+};

@@ -7,9 +7,10 @@ import ViewStyleSelect from './ViewTypeSelect/ViewStyleSelect';
 class BookAppointment extends React.Component<any, any> {
 	handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
-		if (this.props.selectedSubject) {
-			if (this.props.selectedType === 'single') this.props.history.push('/appointment/book/single-view');
-			else this.props.history.push('/appointment/book/multi-view');
+		const { selectedSubject, selectedType, history } = this.props;
+		if (selectedSubject) {
+			if (selectedType === 'single') history.push('/appointment/book/single-view');
+			else history.push('/appointment/book/multi-view');
 		} else {
 			alert('Please select a subject.');
 		}

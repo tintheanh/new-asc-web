@@ -2,7 +2,6 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { login, clearError } from 'redux/stores/auth/action';
-import styles from './styles.module.css';
 
 class Login extends React.Component<any, any> {
 	state = {
@@ -15,18 +14,17 @@ class Login extends React.Component<any, any> {
 
 	handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
-		this.props
-			.login(this.state.studentId)
-			.then(() => this.props.clearError())
-			.catch((err: Error) => console.warn(err.message));
+		const { login, clearError } = this.props;
+		login(this.state.studentId).then(() => clearError()).catch((err: Error) => console.warn(err.message));
 	};
 
 	render() {
-		if (this.props.profile) return <Redirect to="/appointment" />;
+		const { profile, error } = this.props;
+		if (profile) return <Redirect to="/appointment" />;
 		return (
 			<div className="container">
 				<div className="box-form">
-					{this.props.error.length ? (
+					{error.length ? (
 						<div className="alert alert-danger" role="alert">
 							{this.props.error}
 						</div>

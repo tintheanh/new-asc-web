@@ -1,0 +1,13 @@
+.datePickWrapper {
+	display: grid;
+	grid-template-columns: 30% 30%;
+	column-gap: 14px;
+}
+
+.datePick {
+	width: auto;
+}
+
+.tutorSelect {
+	width: 50%;
+}

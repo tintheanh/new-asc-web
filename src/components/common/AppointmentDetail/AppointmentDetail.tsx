@@ -6,19 +6,20 @@ import styles from './styles.module.css';
 import { makeAppointment, appointmentStoreClear } from 'redux/stores/appointment/action';
 import { subjectStoreClear } from 'redux/stores/subject/action';
 import { tutorStoreClear } from 'redux/stores/tutor/action';
+import { dateStoreClear } from 'redux/stores/date/action';
 
 const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
 
 class AppointmentDetail extends React.Component<any, any> {
 	handleSubmit = () => {
 		if (this.props.hour % 1 === 0) {
-			this.props.selectedDate.setHours(Math.floor(this.props.hour), 0, 0);
+			this.props.dayOne.setHours(Math.floor(this.props.hour), 0, 0);
 		} else {
-			this.props.selectedDate.setHours(Math.floor(this.props.hour), 30, 0);
+			this.props.dayOne.setHours(Math.floor(this.props.hour), 30, 0);
 		}
 
 		const appointment = {
-			apptDate: Math.floor(this.props.selectedDate.getTime() / 1000),
+			apptDate: Math.floor(this.props.dayOne.getTime() / 1000),
 			dateCreated: Math.floor(Date.now() / 1000),
 			status: 'pending',
 			student_id: this.props.profile.uid,
@@ -30,7 +31,7 @@ class AppointmentDetail extends React.Component<any, any> {
 			tutor_id: this.props.tutor.uid
 		};
 
-		const data = { appointment, day: this.props.selectedDate.getDay(), tutor: this.props.tutor };
+		const data = { appointment, day: this.props.dayOne.getDay(), tutor: this.props.tutor };
 		this.props
 			.makeAppointment(data)
 			.then(() => {
@@ -39,6 +40,7 @@ class AppointmentDetail extends React.Component<any, any> {
 				this.props.appointmentStoreClear();
 				this.props.subjectStoreClear();
 				this.props.tutorStoreClear();
+				this.props.dateStoreClear();
 			})
 			.catch((err: Error) => console.warn(err.message));
 	};
@@ -52,7 +54,7 @@ class AppointmentDetail extends React.Component<any, any> {
 					<h4>Subject: {this.props.selectedSubject.label}</h4>
 				</div>
 				<div className="alert alert-success">
-					<h4>Date: {this.props.selectedDate.toLocaleDateString('en-US', options)}</h4>
+					<h4>Date: {this.props.dayOne.toLocaleDateString('en-US', options)}</h4>
 					<h4>From: {floatToTime(this.props.hour)}</h4>
 					<h4>To: {floatToTime(this.props.hour + 0.5)}</h4>
 				</div>
@@ -71,12 +73,16 @@ class AppointmentDetail extends React.Component<any, any> {
 
 const mapStateToProps = (state: any) => ({
 	profile: state.auth.data.profile,
-	selectedDate: state.tutor.data.selectedDate,
+	dayOne: state.date.data.dayOne,
 	selectedSubject: state.subject.data.subject
 });
 
 const FinalComp = withRouter(AppointmentDetail);
 
-export default connect(mapStateToProps, { makeAppointment, appointmentStoreClear, subjectStoreClear, tutorStoreClear })(
-	FinalComp
-);
+export default connect(mapStateToProps, {
+	makeAppointment,
+	appointmentStoreClear,
+	subjectStoreClear,
+	tutorStoreClear,
+	dateStoreClear
+})(FinalComp);

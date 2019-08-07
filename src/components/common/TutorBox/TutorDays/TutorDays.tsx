@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { timeStringToFloat } from 'utils/functions';
-import Hour from './Hour/Hour';
+import Hour from '../../Hour/Hour';
 
 const processWorkHours = (hours: any[]) => {
 	const totalHrs: number[] = [];
@@ -16,7 +16,7 @@ const processWorkHours = (hours: any[]) => {
 	return totalHrs;
 };
 
-const TutorHours = (props: any) => {
+const TutorDays = (props: any) => {
 	if (props.hours !== 'none') {
 		return (
 			<div className="alert alert-info" style={wrapperStyle}>
@@ -30,7 +30,8 @@ const TutorHours = (props: any) => {
 const wrapperStyle = {
 	display: 'grid',
 	gridTemplateColumns: 'auto auto auto auto auto auto',
-	paddingBottom: 8
+	paddingBottom: 8,
+	marginTop: 18
 };
 
-export default TutorHours;
+export default TutorDays;
