@@ -16,19 +16,22 @@ class Hour extends React.Component<any, any> {
 
 	checkVacancy = (hr: any) => {
 		const timeString = floatToTime(hr);
-		for (const day of this.props.tutor.work_schedule[this.props.dayOne.getDay()]) {
+		const pickedMonth = this.props.data.date.getMonth();
+		const pickedDate = this.props.data.date.getDate();
+		for (const day of this.props.data.tutor.work_schedule[this.props.data.date.getDay()]) {
 			if (day.appointments) {
 				for (const app of day.appointments) {
-					const pickedMonth = this.props.dayOne.getMonth();
-					const apptMonth = new Date(app.date * 1000).getMonth();
-					const pickedDate = this.props.dayOne.getDate();
-					const apptDate = new Date(app.date * 1000).getDate();
-					if (timeString === app.from && (pickedMonth === apptMonth && pickedDate === apptDate)) {
-						return false;
+					if (timeString === app.from) {
+						const apptMonth = new Date(app.date * 1000).getMonth();
+						const apptDate = new Date(app.date * 1000).getDate();
+						if (pickedMonth === apptMonth && pickedDate === apptDate) {
+							return false;
+						}
 					}
 				}
 			}
 		}
+
 		return true;
 	};
 
@@ -49,6 +52,14 @@ class Hour extends React.Component<any, any> {
 					</p>
 				)}
 
+				{/* <p
+					className="alert alert-success"
+					style={{ ...styles.vacantStyle, textAlign: 'center' }}
+					onClick={this.toggleModal('open')}
+				>
+					{floatToTime(this.props.hour)}
+				</p> */}
+
 				<Modal
 					isOpen={this.state.modal}
 					style={{
@@ -61,7 +72,7 @@ class Hour extends React.Component<any, any> {
 				>
 					{this.state.modal ? (
 						<AppointmentDetail
-							tutor={this.props.tutor}
+							data={this.props.data}
 							hour={this.props.hour}
 							close={this.toggleModal('close')}
 						/>
@@ -91,6 +102,6 @@ const styles = {
 	}
 };
 
-const mapStateToProps = (state: any) => ({ dayOne: state.date.data.dayOne });
+const mapStateToProps = (state: any) => ({ dayOne: state.date.data.dayOne, dates: state.date.data.dates });
 
 export default connect(mapStateToProps, null)(Hour);

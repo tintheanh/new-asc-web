@@ -16,15 +16,12 @@ const processWorkHours = (hours: any[]) => {
 	return totalHrs;
 };
 
-const TutorDays = (props: any) => {
-	if (props.hours !== 'none') {
-		return (
-			<div className="alert alert-info" style={wrapperStyle}>
-				{processWorkHours(props.hours).map((hr, i) => <Hour key={i} hour={hr} tutor={props.tutor} />)}
-			</div>
-		);
-	}
-	return null;
+const TutorDay = (props: any) => {
+	return (
+		<div className="alert alert-info" style={wrapperStyle}>
+			{processWorkHours(props.hours).map((hr, i) => <Hour key={i} hour={hr} data={props.data} />)}
+		</div>
+	);
 };
 
 const wrapperStyle = {
@@ -34,4 +31,4 @@ const wrapperStyle = {
 	marginTop: 18
 };
 
-export default TutorDays;
+export default TutorDay;

@@ -59,6 +59,14 @@ const TutorReducer = (state: TutorState = initialState, action: ActionPayload): 
 				...state,
 				error: action.payload.error
 			};
+		case TutorActionTypes.CLEAR_TUTOR:
+			return {
+				...state,
+				data: {
+					...state.data,
+					selectedTutor: action.payload.data.selectedTutor
+				}
+			};
 		case TutorActionTypes.CLEAR:
 			return { ...initialState };
 		default:

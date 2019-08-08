@@ -12,37 +12,37 @@ const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numer
 
 class AppointmentDetail extends React.Component<any, any> {
 	handleSubmit = () => {
-		if (this.props.hour % 1 === 0) {
-			this.props.dayOne.setHours(Math.floor(this.props.hour), 0, 0);
-		} else {
-			this.props.dayOne.setHours(Math.floor(this.props.hour), 30, 0);
-		}
+		// if (this.props.hour % 1 === 0) {
+		// 	this.props.dayOne.setHours(Math.floor(this.props.hour), 0, 0);
+		// } else {
+		// 	this.props.dayOne.setHours(Math.floor(this.props.hour), 30, 0);
+		// }
 
-		const appointment = {
-			apptDate: Math.floor(this.props.dayOne.getTime() / 1000),
-			dateCreated: Math.floor(Date.now() / 1000),
-			status: 'pending',
-			student_id: this.props.profile.uid,
-			subject_id: this.props.selectedSubject.value,
-			time: {
-				from: floatToTime(this.props.hour),
-				to: floatToTime(this.props.hour + 0.5)
-			},
-			tutor_id: this.props.tutor.uid
-		};
+		// const appointment = {
+		// 	apptDate: Math.floor(this.props.dayOne.getTime() / 1000),
+		// 	dateCreated: Math.floor(Date.now() / 1000),
+		// 	status: 'pending',
+		// 	student_id: this.props.profile.uid,
+		// 	subject_id: this.props.selectedSubject.value,
+		// 	time: {
+		// 		from: floatToTime(this.props.hour),
+		// 		to: floatToTime(this.props.hour + 0.5)
+		// 	},
+		// 	tutor_id: this.props.tutor.uid
+		// };
 
-		const data = { appointment, day: this.props.dayOne.getDay(), tutor: this.props.tutor };
-		this.props
-			.makeAppointment(data)
-			.then(() => {
-				alert('Make appointment successfully. You will receive an email as the confirmation.');
-				this.props.history.push('/appointment');
-				this.props.appointmentStoreClear();
-				this.props.subjectStoreClear();
-				this.props.tutorStoreClear();
-				this.props.dateStoreClear();
-			})
-			.catch((err: Error) => console.warn(err.message));
+		// const data = { appointment, day: this.props.dayOne.getDay(), tutor: this.props.tutor };
+		// this.props
+		// 	.makeAppointment(data)
+		// 	.then(() => {
+		// 		alert('Make appointment successfully. You will receive an email as the confirmation.');
+		// 		this.props.history.push('/appointment');
+		// 		this.props.appointmentStoreClear();
+		// 		this.props.subjectStoreClear();
+		// 		this.props.tutorStoreClear();
+		// 		this.props.dateStoreClear();
+		// 	})
+		// 	.catch((err: Error) => console.warn(err.message));
 	};
 
 	render() {
@@ -50,11 +50,11 @@ class AppointmentDetail extends React.Component<any, any> {
 			<div>
 				<h3 className="alert alert-info">Appointment detail</h3>
 				<div className="alert alert-warning">
-					<h4>Tutor: {this.props.tutor.name}</h4>
+					<h4>Tutor: {this.props.data.tutor.name}</h4>
 					<h4>Subject: {this.props.selectedSubject.label}</h4>
 				</div>
 				<div className="alert alert-success">
-					<h4>Date: {this.props.dayOne.toLocaleDateString('en-US', options)}</h4>
+					<h4>Date: {this.props.data.date.toLocaleDateString('en-US', options)}</h4>
 					<h4>From: {floatToTime(this.props.hour)}</h4>
 					<h4>To: {floatToTime(this.props.hour + 0.5)}</h4>
 				</div>

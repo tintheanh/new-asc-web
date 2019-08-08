@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { fetchTutorsOneDay } from 'redux/stores/tutor/action';
+import {  } from 'redux/stores/tutor/action';
 import { DateSelect, TutorBox } from 'components/common';
 import TutorSelect from './TutorSelect/TutorSelect';
 import styles from './styles.module.css';
@@ -26,7 +26,7 @@ class MultiViewAppointment extends React.Component<any, any> {
 					<div className={styles.tutorSelect}>
 						<TutorSelect />
 					</div>
-					{selectedTutor ? (
+					{/* {selectedTutor ? (
 						<TutorBox
 							key={selectedTutor.uid}
 							type="multi"
@@ -37,7 +37,7 @@ class MultiViewAppointment extends React.Component<any, any> {
 								work_schedule: selectedTutor.work_schedule
 							}}
 						/>
-					) : null}
+					) : null} */}
 				</div>
 			</div>
 		);
@@ -51,4 +51,4 @@ const mapStateToProps = (state: any) => ({
 	selectedTutor: state.tutor.data.selectedTutor
 });
 
-export default connect(mapStateToProps, { fetchTutorsOneDay })(MultiViewAppointment);
+export default connect(mapStateToProps, {  })(MultiViewAppointment);

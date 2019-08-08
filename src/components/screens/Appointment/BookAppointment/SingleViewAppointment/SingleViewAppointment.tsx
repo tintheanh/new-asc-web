@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { fetchTutorsOneDay } from 'redux/stores/tutor/action';
+import { fetchTutors } from 'redux/stores/tutor/action';
 import { DateSelect, TutorBox } from 'components/common';
 
 class SingleViewAppointment extends React.Component<any, any> {
@@ -8,20 +8,20 @@ class SingleViewAppointment extends React.Component<any, any> {
 		this._fetch();
 	}
 
-	componentDidUpdate(prevProps: any) {
-		if (this.props.dayOne.getTime() !== prevProps.dayOne.getTime()) {
+	componentDidUpdate(prevProps: any, _: any) {
+		if (this.props.dates[0].getTime() !== prevProps.dates[0].getTime()) {
 			this._fetch();
 		}
 	}
 
 	_fetch = () => {
-		const { fetchTutorsOneDay, selectedSubject, dayOne } = this.props;
-		fetchTutorsOneDay(selectedSubject.value, dayOne.getDay());
+		const { fetchTutors, selectedSubject, dates } = this.props;
+		fetchTutors(selectedSubject.value, dates);
 	};
 
 	render() {
-		const { selectedSubject, dayOne, tutors } = this.props;
-		console.log(tutors);
+		const { selectedSubject, datesWithTutors } = this.props;
+		console.log(datesWithTutors);
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
@@ -31,15 +31,12 @@ class SingleViewAppointment extends React.Component<any, any> {
 						<DateSelect />
 					</div>
 
-					{tutors.length ? (
-						tutors.map((tutor: any) => (
-							<TutorBox
-								key={tutor.uid}
-								type="single"
-								hours={tutor.work_schedule}
-								tutor={{ uid: tutor.uid, name: tutor.name, work_schedule: tutor.work_schedule }}
-							/>
+					{datesWithTutors.length ? datesWithTutors[0].tutors.length ? (
+						datesWithTutors[0].tutors.map((tutor: any, i: number) => (
+							<TutorBox key={i} type="single" data={{ date: datesWithTutors[0].date, tutor: tutor }} />
 						))
+					) : (
+						<div className="alert alert-danger">No tutor is available during the selected date period.</div>
 					) : (
 						<div className="alert alert-danger">No tutor is available during the selected date period.</div>
 					)}
@@ -51,8 +48,8 @@ class SingleViewAppointment extends React.Component<any, any> {
 
 const mapStateToProps = (state: any) => ({
 	selectedSubject: state.subject.data.subject,
-	dayOne: state.date.data.dayOne,
-	tutors: state.tutor.data.tutors
+	datesWithTutors: state.tutor.data.tutors,
+	dates: state.date.data.dates
 });
 
-export default connect(mapStateToProps, { fetchTutorsOneDay })(SingleViewAppointment);
+export default connect(mapStateToProps, { fetchTutors })(SingleViewAppointment);

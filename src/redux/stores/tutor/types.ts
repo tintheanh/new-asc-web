@@ -10,6 +10,8 @@ export enum TutorActionTypes {
 	FETCH_TUTOR_SUCESS = '@@tutor/FETCH_TUTOR_SUCESS',
 	FETCH_TUTOR_FAILURE = '@@tutor/FETCH_TUTOR_FAILURE',
 
+	CLEAR_TUTOR = '@@tutor/CLEAR_TUTOR',
+
 	CLEAR = '@@tutor/CLEAR'
 }
 

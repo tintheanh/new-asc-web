@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import TutorDays from './TutorDays/TutorDays';
+import TutorDay from './TutorDay/TutorDay';
 import { traverseWeekdays } from 'utils/functions';
 
 const dayArr = (d1: Date, d2: Date) => {
@@ -10,33 +10,39 @@ const dayArr = (d1: Date, d2: Date) => {
 	return traverseWeekdays(d1.getDay(), d2.getDay(), type);
 };
 
+const daysOfWeek = (dates: Date[]) => dates.map((date) => date.getDay());
+
 const TutorBox = (props: any) => {
 	if (props.type === 'single') {
-		if (props.hours[props.dayOne.getDay()] !== 'none') {
-			return (
-				<div>
-					<h4>{props.tutor.name}</h4>
-					<TutorDays hours={props.hours[props.dayOne.getDay()]} tutor={props.tutor} />
-				</div>
-			);
-		}
-		return null;
+		return (
+			<div>
+				<h4>{props.data.tutor.name}</h4>
+				{props.data.tutor.work_schedule.map((day: any, i: number) => {
+					if (i === props.data.date.getDay()) {
+						return <TutorDay key={i} hours={day} data={{ date: props.data.date, tutor: props.data.tutor }} />;
+					}
+					return null;
+				})}
+			</div>
+		);
 	}
 	return (
-		<div>
-			<h4>{props.tutor.name}</h4>
-			{props.hours.map((hr: any, i: number) => {
-				if (dayArr(props.dayOne, props.dayTwo).includes(i))
-					return <TutorDays key={i} hours={hr} tutor={props.tutor} />;
-				return null;
-			})}
-		</div>
+		// <div>
+		// 	<h4>{props.tutor.name}</h4>
+		// 	{props.hours.map((hr: any, i: number) => {
+		// 		if (dayArr(props.dayOne, props.dayTwo).includes(i))
+		// 			return <TutorDay key={i} hours={hr} tutor={props.tutor} />;
+		// 		return null;
+		// 	})}
+		// </div>
+		null
 	);
 };
 
 const mapStateToProps = (state: any) => ({
 	dayOne: state.date.data.dayOne,
-	dayTwo: state.date.data.dayTwo
+	dayTwo: state.date.data.dayTwo,
+	dates: state.date.data.dates
 });
 
 export default connect(mapStateToProps, null)(TutorBox);

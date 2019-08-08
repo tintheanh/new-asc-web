@@ -27,7 +27,7 @@ class App extends React.Component {
 							<PrivateRoute exact path="/appointment" component={Appointment} />
 							<PrivateRoute exact path="/appointment/book" component={BookAppointment} />
 							<PrivateRoute exact path="/appointment/book/single-view" component={SingleViewAppointment} />
-							<PrivateRoute exact path="/appointment/book/multi-view" component={MultiViewAppointment} />
+							{/* <PrivateRoute exact path="/appointment/book/multi-view" component={MultiViewAppointment} /> */}
 							<Route component={NotFound} />
 						</Switch>
 					</BrowserRouter>

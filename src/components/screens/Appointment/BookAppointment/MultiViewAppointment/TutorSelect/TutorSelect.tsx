@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Select from 'react-select';
 import { connect } from 'react-redux';
-import { fetchTutorMultiDay, fetchTutor } from 'redux/stores/tutor/action';
+// import { fetchTutorMultiDay, fetchTutor } from 'redux/stores/tutor/action';
 
 class TutorSelect extends React.Component<any, any> {
 	componentDidMount() {
@@ -49,4 +49,4 @@ const mapStateToProps = (state: any) => ({
 	dayTwo: state.date.data.dayTwo
 });
 
-export default connect(mapStateToProps, { fetchTutorMultiDay, fetchTutor })(TutorSelect);
+export default connect(mapStateToProps, {  })(TutorSelect);
