@@ -1,28 +1,47 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { performDeleteAppointment } from 'redux/stores/auth/action';
+import { deleteAppointment, clearAuthStore } from 'redux/stores/auth/action';
 import AppointmentTable from './AppointmentTable/AppointmentTable';
 import ReasonInput from './ReasonInput/ReasonInput';
 import styles from './styles.module.css';
 
 class ManageAppointment extends React.Component<any, any> {
 	handleDelete = () => {
-		if (this.props.selectedAppointment) {
-			const thingToDelete = {
-				tutor_id: this.props.selectedAppointment.tutor_id,
-				day: new Date(this.props.selectedAppointment.apptDate * 1000).getDay(),
-				appt_id: this.props.selectedAppointment.id,
-				reason: this.props.reasonToDeleteAppt
+		const { selectedAppointment, profile } = this.props;
+		if (selectedAppointment) {
+			const data = {
+				thingToDelete: {
+					tutor_id: selectedAppointment.tutor_id,
+					day: new Date(selectedAppointment.apptDate * 1000).getDay(),
+					appt_id: selectedAppointment.id,
+				},
+				profile,
+				forEmail: {
+					tutorName: selectedAppointment.tutor,
+					tutorEmail: selectedAppointment.tutorEmail,
+					studentName: `${profile.first_name} ${profile.last_name}`,
+					studentEmail: profile.email,
+					subject: selectedAppointment.subject,
+					date: new Date(selectedAppointment.apptDate * 1000).toDateString(),
+					timeFrom: selectedAppointment.time.from,
+					timeTo: selectedAppointment.time.to,
+					reason: this.props.reasonToDeleteAppt
+				}
 			};
-			console.log('test');
-			console.log(thingToDelete);
-			this.props.performDeleteAppointment(thingToDelete, this.props.profile);
+			if (window.confirm('Are you sure to delete this appointment?')) {
+				this.props.deleteAppointment(data);
+			}
 		} else {
 			alert('Please select one appointment to delete.');
 		}
 	};
+
+	navigateBack = () => {
+		this.props.history.push('/appointment');
+		this.props.clearAuthStore();
+	};
+
 	render() {
-		console.log(this.props.profile);
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
@@ -32,7 +51,9 @@ class ManageAppointment extends React.Component<any, any> {
 						<button className="form-control btn btn-primary" onClick={this.handleDelete}>
 							Delete
 						</button>
-						<button className="form-control btn btn-primary">Back</button>
+						<button className="form-control btn btn-primary" onClick={this.navigateBack}>
+							Back
+						</button>
 					</div>
 				</div>
 			</div>
@@ -46,4 +67,4 @@ const mapStateToProps = (state: any) => ({
 	selectedAppointment: state.auth.data.selectedAppointment
 });
 
-export default connect(mapStateToProps, { performDeleteAppointment })(ManageAppointment);
+export default connect(mapStateToProps, { deleteAppointment, clearAuthStore })(ManageAppointment);

@@ -23,14 +23,13 @@ class AppointmentTable extends React.Component<any, any> {
 			}
 		];
 		const { profile, selectedAppointment } = this.props;
-		console.log(selectedAppointment);
 		return (
 			<ReactTable
 				style={{ cursor: 'pointer' }}
 				columns={columns}
-				showPagination={false}
-				minRows={10}
+				defaultPageSize={10}
 				data={profile.appointments}
+				noDataText="No appointments found."
 				defaultSorted={[
 					{
 						id: 'date',

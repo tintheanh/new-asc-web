@@ -47,6 +47,7 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 							const finalTutor = {
 								uid: tutor.id,
 								name: `${tutor.data().first_name} ${tutor.data().last_name}`,
+								email: tutor.data().email,
 								work_schedule: processWorkSchedule
 							};
 							return finalTutor;

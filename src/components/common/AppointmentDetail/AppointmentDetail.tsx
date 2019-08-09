@@ -30,6 +30,7 @@ class AppointmentDetail extends React.Component<any, any> {
 			tutor_id: data.tutor.uid
 		};
 		const dataToDb = { appointment, day: date.getDay(), tutor: data.tutor, subject: selectedSubject };
+		console.log(dataToDb, profile);
 		this.props
 			.makeAppointment(dataToDb, profile)
 			.then(() => {

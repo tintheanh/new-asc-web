@@ -24,7 +24,7 @@ class SingleViewAppointment extends React.Component<any, any> {
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
-					<h3>{`Subject selected: ${selectedSubject.label}`}</h3>
+					{selectedSubject ? <h3>{`Subject selected: ${selectedSubject.label}`}</h3> : null}
 					<div style={{ width: '30%', marginBottom: 8 }}>
 						<p>Select a date</p>
 						<DateSelect noTo />
@@ -32,11 +32,7 @@ class SingleViewAppointment extends React.Component<any, any> {
 
 					{datesWithTutors.length ? datesWithTutors[0].tutors.length ? (
 						datesWithTutors[0].tutors.map((tutor: any, i: number) => (
-							<TutorBox
-								key={i}
-								hideDate
-								data={{ date: datesWithTutors[0].date, tutor: tutor }}
-							/>
+							<TutorBox key={i} hideDate data={{ date: datesWithTutors[0].date, tutor: tutor }} />
 						))
 					) : (
 						<div className="alert alert-danger">No tutor is available during the selected date period.</div>

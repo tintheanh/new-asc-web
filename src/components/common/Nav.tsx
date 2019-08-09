@@ -6,6 +6,7 @@ import { logout } from 'redux/stores/auth/action';
 import { subjectStoreClear } from 'redux/stores/subject/action';
 import { tutorStoreClear } from 'redux/stores/tutor/action';
 import { dateStoreClear } from 'redux/stores/date/action';
+import { clearAuthStore } from 'redux/stores/auth/action';
 
 class Nav extends React.Component<any, any> {
 	performLogout = () => {
@@ -19,10 +20,11 @@ class Nav extends React.Component<any, any> {
 	};
 
 	_clearStores = () => {
-		const { subjectStoreClear, tutorStoreClear, dateStoreClear } = this.props;
+		const { subjectStoreClear, tutorStoreClear, dateStoreClear, clearAuthStore } = this.props;
 		subjectStoreClear();
 		tutorStoreClear();
 		dateStoreClear();
+		clearAuthStore();
 	};
 
 	render() {
@@ -65,5 +67,6 @@ export default connect(mapStateToProps, {
 	logout,
 	subjectStoreClear,
 	tutorStoreClear,
-	dateStoreClear
+	dateStoreClear,
+	clearAuthStore
 })(FinNav);

@@ -25,7 +25,13 @@ const AuthReducer = (state: AuthState = initialState, action: ActionPayload): Au
 				error: action.payload.error
 			};
 		case AuthActionTypes.MAKE_APPOINTMENT_SUCCESS:
-			return { ...state };
+			return {
+				...state,
+				data: {
+					...state.data,
+					profile: action.payload.data.profile
+				}
+			};
 		case AuthActionTypes.MAKE_APPOINTMENT_FAILURE:
 			return {
 				...state,
@@ -76,6 +82,15 @@ const AuthReducer = (state: AuthState = initialState, action: ActionPayload): Au
 			return {
 				...state,
 				error: action.payload.error
+			};
+		case AuthActionTypes.CLEAR_STORE:
+			return {
+				...state,
+				data: {
+					...state.data,
+					selectedAppointment: action.payload.data.selectedAppointment,
+					reasonToDeleteAppt: action.payload.data.reasonToDeleteAppt
+				}
 			};
 		case AuthActionTypes.CLEAR_ERROR:
 			return {

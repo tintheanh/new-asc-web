@@ -41,28 +41,64 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 							.child(newKey)
 							.set({ ...data.appointment.time, date: data.appointment.apptDate })
 							.then(() => {
-								const newProfile = { ...profile };
-								const newAppointment = {
-									id: newKey,
-									student_id: data.appointment.student_id,
-									tutor: data.tutor.name,
-									tutor_id: data.appointment.tutor_id,
+								const emailData = {
+									tutorName: data.tutor.name,
+									tutorEmail: data.tutor.email,
+									studentName: `${profile.first_name} ${profile.last_name}`,
+									studentEmail: profile.email,
 									subject: data.subject.label,
-									apptDate: data.appointment.apptDate
+									date: new Date(data.appointment.apptDate * 1000).toDateString(),
+									timeFrom: data.appointment.time.from,
+									timeTo: data.appointment.time.to
 								};
-								newProfile.appointments.push(newAppointment);
-								dispatch({
-									type: AuthActionTypes.MAKE_APPOINTMENT_SUCCESS,
-									payload: {
-										data: {
-											profile: newProfile,
-											selectedAppointment: null,
-											reasonToDeleteAppt: ''
+								fetch(
+									'https://us-central1-asc-management-app.cloudfunctions.net/sendMailForMakingAppointment',
+									{
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json'
 										},
-										error: ''
+										body: JSON.stringify(emailData)
 									}
-								});
-								resolve();
+								)
+									.then((_) => {
+										const newProfile = { ...profile };
+										const newAppointment = {
+											id: newKey,
+											student_id: data.appointment.student_id,
+											tutor: data.tutor.name,
+											tutor_id: data.appointment.tutor_id,
+											subject: data.subject.label,
+											apptDate: data.appointment.apptDate
+										};
+										newProfile.appointments.push(newAppointment);
+										dispatch({
+											type: AuthActionTypes.MAKE_APPOINTMENT_SUCCESS,
+											payload: {
+												data: {
+													profile: newProfile,
+													selectedAppointment: null,
+													reasonToDeleteAppt: ''
+												},
+												error: ''
+											}
+										});
+										resolve();
+									})
+									.catch((err) => {
+										dispatch({
+											type: AuthActionTypes.MAKE_APPOINTMENT_FAILURE,
+											payload: {
+												data: {
+													profile: null,
+													selectedAppointment: null,
+													reasonToDeleteAppt: ''
+												},
+												error: err.message
+											}
+										});
+										reject(err);
+									});
 							})
 							.catch((err) => {
 								dispatch({
@@ -151,13 +187,16 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 											student_id: apptObj[key].student_id,
 											tutor: `${tutorRef.data()!.first_name} ${tutorRef.data()!.last_name}`,
 											tutor_id: apptObj[key].tutor_id,
+											tutorEmail: tutorRef.data()!.email,
 											subject: `${subjectRef.data()!.label} - ${subjectRef.data()!.full}`,
-											apptDate: apptObj[key].apptDate
+											apptDate: apptObj[key].apptDate,
+											time: apptObj[key].time
 										};
 									})
 								);
 
 								studentAppts = appts.filter((appt: any) => appt.student_id === user.uid);
+								console.log(studentAppts);
 							} else {
 								studentAppts = [];
 							}
@@ -317,9 +356,8 @@ export const inputReason = (reason: any) => (dispatch: (arg: ActionPayload) => v
 	});
 };
 
-export const performDeleteAppointment = (thingToDelete: any, profile: any) => (
-	dispatch: (arg: ActionPayload) => void
-) => {
+export const deleteAppointment = (data: any) => (dispatch: (arg: ActionPayload) => void) => {
+	const { thingToDelete, profile, forEmail } = data;
 	const { tutor_id, appt_id, day } = thingToDelete;
 
 	fbdb.ref(`appointments/${appt_id}`).remove().then(async () => {
@@ -332,21 +370,45 @@ export const performDeleteAppointment = (thingToDelete: any, profile: any) => (
 				.ref(`tutors/${tutor_id}/work_schedule/${day}/${index}/appointments/${appt_id}`)
 				.remove()
 				.then(() => {
-					const newProfile = { ...profile };
-					const filtered = newProfile.appointments.filter((appt: any) => appt.id !== thingToDelete.appt_id);
-					newProfile.appointments = filtered;
+					fetch('https://us-central1-asc-management-app.cloudfunctions.net/sendMailForDeletingAppointment', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(forEmail)
+					})
+						.then((_) => {
+							const newProfile = { ...profile };
+							const filtered = newProfile.appointments.filter(
+								(appt: any) => appt.id !== thingToDelete.appt_id
+							);
+							newProfile.appointments = filtered;
 
-					dispatch({
-						type: AuthActionTypes.DELETE_APPOINTMENT_SUCCESS,
-						payload: {
-							data: {
-								profile: newProfile,
-								selectedAppointment: null,
-								reasonToDeleteAppt: ''
-							},
-							error: ''
-						}
-					});
+							dispatch({
+								type: AuthActionTypes.DELETE_APPOINTMENT_SUCCESS,
+								payload: {
+									data: {
+										profile: newProfile,
+										selectedAppointment: null,
+										reasonToDeleteAppt: ''
+									},
+									error: ''
+								}
+							});
+						})
+						.catch((err) => {
+							dispatch({
+								type: AuthActionTypes.DELETE_APPOINTMENT_FAILURE,
+								payload: {
+									data: {
+										profile: null,
+										selectedAppointment: null,
+										reasonToDeleteAppt: ''
+									},
+									error: err.message
+								}
+							});
+						});
 				})
 				.catch((err) =>
 					dispatch({
@@ -373,6 +435,20 @@ export const performDeleteAppointment = (thingToDelete: any, profile: any) => (
 					error: 'Could not find shift index.'
 				}
 			});
+		}
+	});
+};
+
+export const clearAuthStore = () => (dispatch: (arg: ActionPayload) => void) => {
+	dispatch({
+		type: AuthActionTypes.CLEAR_STORE,
+		payload: {
+			data: {
+				profile: null,
+				selectedAppointment: null,
+				reasonToDeleteAppt: ''
+			},
+			error: ''
 		}
 	});
 };
