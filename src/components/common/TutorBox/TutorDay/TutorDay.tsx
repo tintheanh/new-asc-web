@@ -17,9 +17,10 @@ const processWorkHours = (hours: any[]) => {
 };
 
 const TutorDay = (props: any) => {
+	const { hours, data } = props;
 	return (
 		<div className="alert alert-info" style={wrapperStyle}>
-			{processWorkHours(props.hours).map((hr, i) => <Hour key={i} hour={hr} data={props.data} />)}
+			{processWorkHours(hours).map((hr, i) => <Hour key={i} hour={hr} data={data} />)}
 		</div>
 	);
 };

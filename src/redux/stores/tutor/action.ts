@@ -1,6 +1,5 @@
 import { fbdb, fsdb } from 'index';
 import { TutorActionTypes, ActionPayload } from './types';
-import { sort, traverseWeekdays } from 'utils/functions';
 
 export const selectType = (type: string) => (dispatch: (arg: ActionPayload) => void) => {
 	dispatch({
@@ -8,7 +7,7 @@ export const selectType = (type: string) => (dispatch: (arg: ActionPayload) => v
 		payload: {
 			data: {
 				selectedType: type,
-				tutors: [],
+				datesWithTutors: [],
 				selectedTutor: null
 			},
 			error: ''
@@ -64,11 +63,11 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 			})
 		);
 		dispatch({
-			type: TutorActionTypes.FETCH_TUTOR_ONE_SUCCESS,
+			type: TutorActionTypes.FETCH_TUTOR_SUCCESS,
 			payload: {
 				data: {
 					selectedType: '',
-					tutors: tutorsInDate,
+					datesWithTutors: tutorsInDate,
 					selectedTutor: null
 				},
 				error: ''
@@ -76,11 +75,11 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 		});
 	} catch (err) {
 		dispatch({
-			type: TutorActionTypes.FETCH_TUTOR_ONE_FAILURE,
+			type: TutorActionTypes.FETCH_TUTOR_FAILURE,
 			payload: {
 				data: {
 					selectedType: '',
-					tutors: [],
+					datesWithTutors: [],
 					selectedTutor: null
 				},
 				error: err.message
@@ -89,19 +88,33 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 	}
 };
 
-export const tutorClear = () => (dispatch: (arg: ActionPayload) => void) => {
+export const selectTutor = (tutor: any) => (dispatch: (arg: ActionPayload) => void) => {
 	dispatch({
-		type: TutorActionTypes.CLEAR_TUTOR,
+		type: TutorActionTypes.SELECT_TUTOR,
 		payload: {
 			data: {
 				selectedType: '',
-				tutors: [],
-				selectedTutor: null
+				datesWithTutors: [],
+				selectedTutor: tutor
 			},
 			error: ''
 		}
 	});
 };
+
+// export const tutorClear = () => (dispatch: (arg: ActionPayload) => void) => {
+// 	dispatch({
+// 		type: TutorActionTypes.CLEAR_TUTOR,
+// 		payload: {
+// 			data: {
+// 				selectedType: '',
+// 				datesWithTutors: [],
+// 				selectedTutor: null
+// 			},
+// 			error: ''
+// 		}
+// 	});
+// };
 
 export const tutorStoreClear = () => (dispatch: (arg: ActionPayload) => void) => {
 	dispatch({
@@ -109,7 +122,7 @@ export const tutorStoreClear = () => (dispatch: (arg: ActionPayload) => void) =>
 		payload: {
 			data: {
 				selectedType: '',
-				tutors: [],
+				datesWithTutors: [],
 				selectedTutor: null
 			},
 			error: ''

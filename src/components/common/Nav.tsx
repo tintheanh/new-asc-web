@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import { logout } from 'redux/stores/auth/action';
 
-import { appointmentStoreClear } from 'redux/stores/appointment/action';
 import { subjectStoreClear } from 'redux/stores/subject/action';
 import { tutorStoreClear } from 'redux/stores/tutor/action';
 import { dateStoreClear } from 'redux/stores/date/action';
@@ -20,8 +19,7 @@ class Nav extends React.Component<any, any> {
 	};
 
 	_clearStores = () => {
-		const { appointmentStoreClear, subjectStoreClear, tutorStoreClear, dateStoreClear } = this.props;
-		appointmentStoreClear();
+		const { subjectStoreClear, tutorStoreClear, dateStoreClear } = this.props;
 		subjectStoreClear();
 		tutorStoreClear();
 		dateStoreClear();
@@ -65,7 +63,6 @@ const mapStateToProps = (state: any) => ({ profile: state.auth.data.profile });
 
 export default connect(mapStateToProps, {
 	logout,
-	appointmentStoreClear,
 	subjectStoreClear,
 	tutorStoreClear,
 	dateStoreClear

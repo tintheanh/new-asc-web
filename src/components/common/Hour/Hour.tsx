@@ -15,15 +15,16 @@ class Hour extends React.Component<any, any> {
 	};
 
 	checkVacancy = (hr: any) => {
+		const { data } = this.props;
 		const timeString = floatToTime(hr);
-		const pickedMonth = this.props.data.date.getMonth();
-		const pickedDate = this.props.data.date.getDate();
-		for (const day of this.props.data.tutor.work_schedule[this.props.data.date.getDay()]) {
+		const pickedMonth = data.date.getMonth();
+		const pickedDate = data.date.getDate();
+		for (const day of data.tutor.work_schedule[data.date.getDay()]) {
 			if (day.appointments) {
-				for (const app of day.appointments) {
-					if (timeString === app.from) {
-						const apptMonth = new Date(app.date * 1000).getMonth();
-						const apptDate = new Date(app.date * 1000).getDate();
+				for (const appt of day.appointments) {
+					if (timeString === appt.from) {
+						const apptMonth = new Date(appt.date * 1000).getMonth();
+						const apptDate = new Date(appt.date * 1000).getDate();
 						if (pickedMonth === apptMonth && pickedDate === apptDate) {
 							return false;
 						}
@@ -36,29 +37,22 @@ class Hour extends React.Component<any, any> {
 	};
 
 	render() {
+		const { hour, data } = this.props;
 		return (
 			<div>
-				{this.checkVacancy(this.props.hour) ? (
+				{this.checkVacancy(hour) ? (
 					<p
 						className="alert alert-success"
 						style={{ ...styles.vacantStyle, textAlign: 'center' }}
 						onClick={this.toggleModal('open')}
 					>
-						{floatToTime(this.props.hour)}
+						{floatToTime(hour)}
 					</p>
 				) : (
 					<p className="alert alert-danger" style={{ ...styles.unVacantStyle, textAlign: 'center' }}>
-						{floatToTime(this.props.hour)}
+						{floatToTime(hour)}
 					</p>
 				)}
-
-				{/* <p
-					className="alert alert-success"
-					style={{ ...styles.vacantStyle, textAlign: 'center' }}
-					onClick={this.toggleModal('open')}
-				>
-					{floatToTime(this.props.hour)}
-				</p> */}
 
 				<Modal
 					isOpen={this.state.modal}
@@ -71,11 +65,7 @@ class Hour extends React.Component<any, any> {
 					}}
 				>
 					{this.state.modal ? (
-						<AppointmentDetail
-							data={this.props.data}
-							hour={this.props.hour}
-							close={this.toggleModal('close')}
-						/>
+						<AppointmentDetail data={data} hour={hour} close={this.toggleModal('close')} />
 					) : null}
 				</Modal>
 			</div>
@@ -102,6 +92,6 @@ const styles = {
 	}
 };
 
-const mapStateToProps = (state: any) => ({ dayOne: state.date.data.dayOne, dates: state.date.data.dates });
+const mapStateToProps = (state: any) => ({ dates: state.date.data.dates });
 
 export default connect(mapStateToProps, null)(Hour);

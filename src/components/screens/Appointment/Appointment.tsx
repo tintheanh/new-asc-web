@@ -12,10 +12,10 @@ const Appointment = () => (
 				<img src={add} style={{ maxHeight: '100px' }} className="image-reponsive" />
 				<label>Book Appointment</label>
 			</Link>
-			<a href="categories/manage">
+			<Link to="/appointment/manage">
 				<img src={view} style={{ maxHeight: '100px' }} className="image-reponsive" />
 				<label>View/Cancel Appointments</label>
-			</a>
+			</Link>
 		</div>
 	</div>
 );

@@ -42,44 +42,43 @@ export const floatToTime = (float: number) => {
 	return (hr < 10 ? '0' : '') + hr + ':' + (min < 10 ? '0' : '') + min + ' AM';
 };
 
-export const traverseWeekdays = (d1: number, d2: number, type: boolean) => {
-	const result = [];
-	if (d1 < d2) {
-		for (let i = d1; i <= d2; i++) {
-			result.push(i);
+export const contains = (arr: any[] | null, obj: any, key: string, nestedKey?: string): boolean => {
+	if (!nestedKey) {
+		if (arr) {
+			if (arr.filter((e) => obj[key] === e[key]).length) return true;
+			return false;
 		}
-	} else if (d1 > d2) {
-		if (d2 !== 0) {
-			for (let i = d1; i !== d2; i++) {
-				if (i === 7) {
-					i = 0;
-				}
-				result.push(i);
-			}
-			result.push(d2);
-		} else {
-			for (let i = d1; i < 7; i++) {
-				result.push(i);
-			}
-			result.push(d2);
-		}
+		return false;
 	} else {
-		if (type) result.push(d1);
-		else {
-			let i = d1;
-
-			while (true) {
-				result.push(i);
-				i++;
-				if (i === 7) {
-					i = 0;
-				}
-				if (i === d2) {
-					break;
-				}
-			}
+		if (arr) {
+			if (arr.filter((e) => obj[key][nestedKey] === e[key][nestedKey]).length) return true;
+			return false;
 		}
+		return false;
+	}
+};
+
+export const convertTimestamp = (timestamp: number) => {
+	var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
+		yyyy = d.getFullYear(),
+		mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+		dd = ('0' + d.getDate()).slice(-2), // Add leading 0.
+		hh = d.getHours(),
+		h = hh,
+		min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
+		ampm = 'AM',
+		time;
+
+	if (hh > 12) {
+		h = hh - 12;
+		ampm = 'PM';
+	} else if (hh === 12) {
+		h = 12;
+		ampm = 'PM';
+	} else if (hh == 0) {
+		h = 12;
 	}
 
-	return result;
+	time = `${mm}/${dd}/${yyyy}, ${h}:${min} ${ampm}`;
+	return time;
 };

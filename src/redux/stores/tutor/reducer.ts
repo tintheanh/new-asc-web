@@ -3,7 +3,7 @@ import { TutorState, ActionPayload, TutorActionTypes } from './types';
 const initialState = {
 	data: {
 		selectedType: 'single',
-		tutors: [],
+		datesWithTutors: [],
 		selectedTutor: null
 	},
 	error: ''
@@ -20,44 +20,26 @@ const TutorReducer = (state: TutorState = initialState, action: ActionPayload): 
 				}
 			};
 
-		case TutorActionTypes.FETCH_TUTOR_ONE_SUCCESS:
+		case TutorActionTypes.FETCH_TUTOR_SUCCESS:
 			return {
 				...state,
 				data: {
 					...state.data,
-					tutors: action.payload.data.tutors
-				}
-			};
-		case TutorActionTypes.FETCH_TUTOR_ONE_FAILURE:
-			return {
-				...state,
-				error: action.payload.error
-			};
-		case TutorActionTypes.FETCH_TUTOR_MULTIPLE_SUCCESS:
-			return {
-				...state,
-				data: {
-					...state.data,
-					tutors: action.payload.data.tutors
-				}
-			};
-		case TutorActionTypes.FETCH_TUTOR_MULTIPLE_FAILURE:
-			return {
-				...state,
-				error: action.payload.error
-			};
-		case TutorActionTypes.FETCH_TUTOR_SUCESS:
-			return {
-				...state,
-				data: {
-					...state.data,
-					selectedTutor: action.payload.data.selectedTutor
+					datesWithTutors: action.payload.data.datesWithTutors
 				}
 			};
 		case TutorActionTypes.FETCH_TUTOR_FAILURE:
 			return {
 				...state,
 				error: action.payload.error
+			};
+		case TutorActionTypes.SELECT_TUTOR:
+			return {
+				...state,
+				data: {
+					...state.data,
+					selectedTutor: action.payload.data.selectedTutor
+				}
 			};
 		case TutorActionTypes.CLEAR_TUTOR:
 			return {

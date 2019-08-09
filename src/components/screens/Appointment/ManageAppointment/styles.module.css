@@ -1,0 +1,8 @@
+.btnWrapper {
+	width: 50%;
+	display: grid;
+	grid-template-columns: auto auto;
+	column-gap: 10px;
+	margin: 20px 0 10px;
+}
+

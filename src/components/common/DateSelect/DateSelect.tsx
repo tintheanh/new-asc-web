@@ -2,32 +2,35 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import DatePicker from 'react-datepicker';
 import { selectDateOne, selectDateTwo } from 'redux/stores/date/action';
-import { tutorClear } from 'redux/stores/tutor/action';
 import styles from './styles.module.css';
 
 class DateSelect extends React.Component<any, any> {
 	static defaultProps = {
-		type: 'day1'
+		type: 'day1',
+		hasMax: false,
+		noTo: false
 	};
+
 	setDateOne = (date: Date) => {
-		const reset = new Date(date.setHours(0, 0, 0));
-		this.props.selectDateOne(reset);
+		const { selectDateOne, dates, noTo } = this.props;
+		selectDateOne(dates, date, noTo);
 	};
 
 	setDateTwo = (date: Date) => {
-		this.props.tutorClear();
-		this.props.selectDateTwo(date);
+		const { selectDateTwo, dates } = this.props;
+		selectDateTwo(dates, date);
 	};
 
 	render() {
+		const { type, dates, hasMax } = this.props;
 		return (
 			<DatePicker
-				selected={this.props.type === 'day1' ? this.props.dayOne : this.props.dayTwo}
-				onChange={this.props.type === 'day1' ? this.setDateOne : this.setDateTwo}
+				selected={type === 'day1' ? dates[0] : dates[dates.length - 1]}
+				onChange={type === 'day1' ? this.setDateOne : this.setDateTwo}
 				className={styles.datePicker}
 				todayButton={'Select Today'}
-				minDate={this.props.type === 'day1' ? new Date() : this.props.dayOne}
-				maxDate={this.props.type === 'day1' ? this.props.dayTwo ? this.props.dayTwo : null : null}
+				minDate={type === 'day1' ? new Date() : dates[0]}
+				maxDate={type === 'day1' ? hasMax ? dates[dates.length - 1] : null : null}
 				dateFormat="eee, MMM d yyyy"
 			/>
 		);
@@ -35,10 +38,8 @@ class DateSelect extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
-	dayOne: state.date.data.dayOne,
-	dayTwo: state.date.data.dayTwo,
 	dates: state.date.data.dates,
 	selectedSubject: state.subject.data.selectedSubject
 });
 
-export default connect(mapStateToProps, { selectDateOne, selectDateTwo, tutorClear })(DateSelect);
+export default connect(mapStateToProps, { selectDateOne, selectDateTwo })(DateSelect);

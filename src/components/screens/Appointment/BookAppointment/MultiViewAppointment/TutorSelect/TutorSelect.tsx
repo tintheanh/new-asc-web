@@ -1,52 +1,59 @@
 import * as React from 'react';
 import Select from 'react-select';
 import { connect } from 'react-redux';
-// import { fetchTutorMultiDay, fetchTutor } from 'redux/stores/tutor/action';
+import { fetchTutors, selectTutor } from 'redux/stores/tutor/action';
 
 class TutorSelect extends React.Component<any, any> {
 	componentDidMount() {
-		this.props.fetchTutorMultiDay(this.props.selectedSubject.value, this.props.dayOne, this.props.dayTwo);
+		this._fetch();
 	}
 
 	componentDidUpdate(prevProps: any) {
-		// if (prevProps.dayOne && prevProps.dayTwo) {
-		// 	if (
-		// 		this.props.dayOne.getTime() !== prevProps.dayOne.getTime() ||
-		// 		this.props.dayTwo.getTime() !== prevProps.dayTwo.getTime()
-		// 	) {
-		// 		this.props.fetchTutorMultiDay(this.props.selectedSubject.value, this.props.dayOne, this.props.dayTwo);
-		// 	}
-		// }
-		if (this.props.dayTwo) {
-			if (prevProps.dayTwo) {
-				if (
-					this.props.dayOne.getTime() !== prevProps.dayOne.getTime() ||
-					this.props.dayTwo.getTime() !== prevProps.dayTwo.getTime()
-				) {
-					this.props.fetchTutorMultiDay(
-						this.props.selectedSubject.value,
-						this.props.dayOne,
-						this.props.dayTwo
-					);
-				}
-			} else {
-				this.props.fetchTutorMultiDay(this.props.selectedSubject.value, this.props.dayOne, this.props.dayTwo);
-			}
+		if (this.props.dates.length !== prevProps.dates.length) {
+			this._fetch();
 		}
 	}
 
-	setTutor = (tutor: any) => this.props.fetchTutor(tutor.value);
+	_fetch = () => {
+		const { fetchTutors, selectedSubject, dates } = this.props;
+		fetchTutors(selectedSubject.value, dates);
+	};
+
+	_gatherTutor = () => {
+		const { datesWithTutors } = this.props;
+		const tutors: any[] = [];
+		datesWithTutors.forEach((date: any) => {
+			date.tutors.forEach((tutor: any) => {
+				if (!tutors.filter((tt: any) => tt.value.uid === tutor.uid).length) {
+					tutors.push({
+						label: tutor.name,
+						value: tutor
+					});
+				}
+			});
+		});
+		return tutors;
+	};
+
+	setTutor = (tutor: any) => this.props.selectTutor(tutor.value);
 
 	render() {
-		return <Select options={this.props.tutors} placeholder="Select tutor..." onChange={this.setTutor} />;
+		return (
+			<Select
+				options={this._gatherTutor()}
+				placeholder="Select tutor..."
+				onChange={this.setTutor}
+				noOptionsMessage={() => 'No tutor.'}
+			/>
+		);
 	}
 }
 
 const mapStateToProps = (state: any) => ({
-	tutors: state.tutor.data.tutors,
+	datesWithTutors: state.tutor.data.datesWithTutors,
 	selectedSubject: state.subject.data.subject,
-	dayOne: state.date.data.dayOne,
-	dayTwo: state.date.data.dayTwo
+	dates: state.date.data.dates,
+	selectedTutor: state.tutor.data.selectedTutor
 });
 
-export default connect(mapStateToProps, {  })(TutorSelect);
+export default connect(mapStateToProps, { fetchTutors, selectTutor })(TutorSelect);

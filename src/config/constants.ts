@@ -5,4 +5,3 @@ export const STORAGEBUCKET = '';
 export const PROJECTID = 'asc-management-app';
 export const MESSAGINGSENDERID = '454260445359';
 export const APPID = '1:454260445359:web:7116a9722bf14be0';
-

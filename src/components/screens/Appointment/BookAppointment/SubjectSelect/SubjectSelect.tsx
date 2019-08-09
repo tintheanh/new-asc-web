@@ -19,6 +19,7 @@ class SubjectSelect extends React.Component<any, any> {
 				placeholder="Select subject..."
 				value={this.props.subject}
 				onChange={this.setSubject}
+				noOptionsMessage={() => 'No subject.'}
 			/>
 		);
 	}

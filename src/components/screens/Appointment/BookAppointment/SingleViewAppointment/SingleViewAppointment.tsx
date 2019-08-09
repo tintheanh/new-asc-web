@@ -21,19 +21,22 @@ class SingleViewAppointment extends React.Component<any, any> {
 
 	render() {
 		const { selectedSubject, datesWithTutors } = this.props;
-		console.log(datesWithTutors);
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
 					<h3>{`Subject selected: ${selectedSubject.label}`}</h3>
 					<div style={{ width: '30%', marginBottom: 8 }}>
 						<p>Select a date</p>
-						<DateSelect />
+						<DateSelect noTo />
 					</div>
 
 					{datesWithTutors.length ? datesWithTutors[0].tutors.length ? (
 						datesWithTutors[0].tutors.map((tutor: any, i: number) => (
-							<TutorBox key={i} type="single" data={{ date: datesWithTutors[0].date, tutor: tutor }} />
+							<TutorBox
+								key={i}
+								hideDate
+								data={{ date: datesWithTutors[0].date, tutor: tutor }}
+							/>
 						))
 					) : (
 						<div className="alert alert-danger">No tutor is available during the selected date period.</div>
@@ -48,7 +51,7 @@ class SingleViewAppointment extends React.Component<any, any> {
 
 const mapStateToProps = (state: any) => ({
 	selectedSubject: state.subject.data.subject,
-	datesWithTutors: state.tutor.data.tutors,
+	datesWithTutors: state.tutor.data.datesWithTutors,
 	dates: state.date.data.dates
 });
 

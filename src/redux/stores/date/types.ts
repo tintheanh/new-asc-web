@@ -7,8 +7,6 @@ export enum DateActionTypes {
 
 export interface DateState {
 	data: {
-		dayOne: Date | null;
-		dayTwo: Date | null;
 		dates: Date[];
 	};
 	error: string;

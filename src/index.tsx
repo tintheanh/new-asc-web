@@ -8,6 +8,7 @@ import 'firebase/functions';
 import { APIKEY, AUTHDOMAIN, DATABASEURL, PROJECTID, STORAGEBUCKET, MESSAGINGSENDERID, APPID } from './config';
 import App from './App';
 import "react-datepicker/dist/react-datepicker.css";
+import 'react-table/react-table.css';
 import * as serviceWorker from './serviceWorker';
 
 const firebaseConfig = {

@@ -1,14 +1,34 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import {  } from 'redux/stores/tutor/action';
+import {} from 'redux/stores/tutor/action';
 import { DateSelect, TutorBox } from 'components/common';
+import { contains } from 'utils/functions';
 import TutorSelect from './TutorSelect/TutorSelect';
 import styles from './styles.module.css';
 
 class MultiViewAppointment extends React.Component<any, any> {
+	_filterDates = () => {
+		const { selectedTutor, datesWithTutors } = this.props;
+		if (selectedTutor) {
+			const filtered = datesWithTutors
+				.map((date: any) => {
+					if (contains(date.tutors, selectedTutor, 'uid')) {
+						const tutors = date.tutors.filter((tutor: any) => tutor.uid === selectedTutor.uid);
+						return {
+							date: date.date,
+							tutors
+						};
+					}
+					return null;
+				})
+				.filter((data: any) => data !== null);
+			return filtered;
+		}
+		return [];
+	};
+
 	render() {
-		const { selectedSubject, tutors, selectedTutor } = this.props;
-		// console.log(tutors);
+		const { selectedSubject, selectedTutor } = this.props;
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
@@ -16,7 +36,7 @@ class MultiViewAppointment extends React.Component<any, any> {
 					<div className={styles.datePickWrapper} style={{ marginBottom: 8 }}>
 						<div className={styles.datePick}>
 							<p>From</p>
-							<DateSelect />
+							<DateSelect hasMax />
 						</div>
 						<div className={styles.datePick}>
 							<p>To</p>
@@ -26,18 +46,16 @@ class MultiViewAppointment extends React.Component<any, any> {
 					<div className={styles.tutorSelect}>
 						<TutorSelect />
 					</div>
-					{/* {selectedTutor ? (
-						<TutorBox
-							key={selectedTutor.uid}
-							type="multi"
-							hours={selectedTutor.work_schedule}
-							tutor={{
-								uid: selectedTutor.uid,
-								name: selectedTutor.name,
-								work_schedule: selectedTutor.work_schedule
-							}}
-						/>
-					) : null} */}
+					{selectedTutor ? (
+						<div>
+							<h4>{selectedTutor.name}</h4>
+							{this._filterDates().map((date: any) => {
+								return date.tutors.map((tutor: any, i: number) => (
+									<TutorBox key={i} hideName type="single" data={{ date: date.date, tutor: tutor }} />
+								));
+							})}
+						</div>
+					) : null}
 				</div>
 			</div>
 		);
@@ -46,9 +64,8 @@ class MultiViewAppointment extends React.Component<any, any> {
 
 const mapStateToProps = (state: any) => ({
 	selectedSubject: state.subject.data.subject,
-	dayOne: state.date.data.dayOne,
-	tutors: state.tutor.data.tutors,
+	datesWithTutors: state.tutor.data.datesWithTutors,
 	selectedTutor: state.tutor.data.selectedTutor
 });
 
-export default connect(mapStateToProps, {  })(MultiViewAppointment);
+export default connect(mapStateToProps, {})(MultiViewAppointment);
