@@ -3,6 +3,7 @@ import { AuthState, ActionPayload, AuthActionTypes } from './types';
 const initialState = {
 	data: {
 		profile: null,
+		appointments: [],
 		selectedAppointment: null,
 		reasonToDeleteAppt: ''
 	},
@@ -24,12 +25,27 @@ const AuthReducer = (state: AuthState = initialState, action: ActionPayload): Au
 				...state,
 				error: action.payload.error
 			};
-		case AuthActionTypes.MAKE_APPOINTMENT_SUCCESS:
+		case AuthActionTypes.FETCH_APPOINTMENT_SUCCESS:
 			return {
 				...state,
 				data: {
 					...state.data,
-					profile: action.payload.data.profile
+					appointments: action.payload.data.appointments
+				}
+			};
+		case AuthActionTypes.FETCH_APPOINTMENT_FAILURE:
+			return {
+				...state,
+				data: {
+					...state.data,
+					appointments: action.payload.data.appointments
+				}
+			};
+		case AuthActionTypes.MAKE_APPOINTMENT_SUCCESS:
+			return {
+				...state,
+				data: {
+					...state.data
 				}
 			};
 		case AuthActionTypes.MAKE_APPOINTMENT_FAILURE:
@@ -73,9 +89,7 @@ const AuthReducer = (state: AuthState = initialState, action: ActionPayload): Au
 				...state,
 				data: {
 					...state.data,
-					profile: action.payload.data.profile,
-					selectedAppointment: action.payload.data.selectedAppointment,
-					reasonToDeleteAppt: action.payload.data.reasonToDeleteAppt
+					appointments: action.payload.data.appointments
 				}
 			};
 		case AuthActionTypes.DELETE_APPOINTMENT_FAILURE:

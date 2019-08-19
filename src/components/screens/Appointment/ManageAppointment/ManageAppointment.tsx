@@ -1,21 +1,25 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { deleteAppointment, clearAuthStore } from 'redux/stores/auth/action';
+import { fetchAppointment, deleteAppointment, clearAuthStore } from 'redux/stores/auth/action';
 import AppointmentTable from './AppointmentTable/AppointmentTable';
 import ReasonInput from './ReasonInput/ReasonInput';
 import styles from './styles.module.css';
 
 class ManageAppointment extends React.Component<any, any> {
+	componentDidMount() {
+		this.props.fetchAppointment(this.props.profile.uid);
+	}
+
 	handleDelete = () => {
-		const { selectedAppointment, profile } = this.props;
+		const {appointments, selectedAppointment, profile } = this.props;
 		if (selectedAppointment) {
 			const data = {
 				thingToDelete: {
 					tutor_id: selectedAppointment.tutor_id,
 					day: new Date(selectedAppointment.apptDate * 1000).getDay(),
-					appt_id: selectedAppointment.id,
+					appt_id: selectedAppointment.id
 				},
-				profile,
+				oldAppointments: appointments,
 				forEmail: {
 					tutorName: selectedAppointment.tutor,
 					tutorEmail: selectedAppointment.tutorEmail,
@@ -42,6 +46,7 @@ class ManageAppointment extends React.Component<any, any> {
 	};
 
 	render() {
+		console.log(this.props.appointments);
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
@@ -62,9 +67,10 @@ class ManageAppointment extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
+	appointments: state.auth.data.appointments,
 	profile: state.auth.data.profile,
 	reasonToDeleteAppt: state.auth.data.reasonToDeleteAppt,
 	selectedAppointment: state.auth.data.selectedAppointment
 });
 
-export default connect(mapStateToProps, { deleteAppointment, clearAuthStore })(ManageAppointment);
+export default connect(mapStateToProps, { fetchAppointment, deleteAppointment, clearAuthStore })(ManageAppointment);

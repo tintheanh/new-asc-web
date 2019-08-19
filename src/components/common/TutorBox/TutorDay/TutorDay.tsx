@@ -2,11 +2,12 @@ import * as React from 'react';
 import { timeStringToFloat } from 'utils/functions';
 import Hour from '../../Hour/Hour';
 
+// TODO: FIX - including "order" in from/to
 const processWorkHours = (hours: any[]) => {
 	const totalHrs: number[] = [];
 	hours.forEach((hr) => {
-		let start = timeStringToFloat(hr.from);
-		const diff = timeStringToFloat(hr.to) - start;
+		let start = timeStringToFloat(hr.from.time);
+		const diff = timeStringToFloat(hr.to.time) - start;
 
 		for (let i = 0; i < diff / 0.5; i++) {
 			totalHrs.push(start);

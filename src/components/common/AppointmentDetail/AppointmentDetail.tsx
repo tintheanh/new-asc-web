@@ -10,7 +10,7 @@ import { dateStoreClear } from 'redux/stores/date/action';
 
 class AppointmentDetail extends React.Component<any, any> {
 	handleSubmit = () => {
-		const { data, hour, profile, selectedSubject } = this.props;
+		const { data, hour, profile, selectedSubject, appointments } = this.props;
 		let date = new Date(data.date.getTime());
 		if (this.props.hour % 1 === 0) {
 			date.setHours(Math.floor(hour), 0, 0);
@@ -32,7 +32,7 @@ class AppointmentDetail extends React.Component<any, any> {
 		const dataToDb = { appointment, day: date.getDay(), tutor: data.tutor, subject: selectedSubject };
 		console.log(dataToDb, profile);
 		this.props
-			.makeAppointment(dataToDb, profile)
+			.makeAppointment(dataToDb, profile, appointments)
 			.then(() => {
 				alert('Make appointment successfully. You will receive an email as the confirmation.');
 				this.props.history.push('/appointment');
@@ -71,6 +71,7 @@ class AppointmentDetail extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
+	appointments: state.auth.data.appointments,
 	profile: state.auth.data.profile,
 	selectedSubject: state.subject.data.subject
 });

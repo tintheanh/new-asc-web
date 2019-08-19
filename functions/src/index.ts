@@ -85,7 +85,7 @@ const generateMakingTemplate = (data: any) => `
     Academic Support Center Tutoring Team
     <br />
     <br />
-    This email address is unmonitored, please do not reply to it , you message will not reach anyone. </p>
+    This email address is unmonitored, please do not reply to it , your message will not reach anyone. </p>
 </body>
 
 </html>`;
@@ -161,7 +161,7 @@ const generateDeletingTemplate = (data: any) => {
       Academic Support Center Tutoring Team
       <br />
       <br />
-      This email address is unmonitored, please do not reply to it , you message will not reach anyone. </p>
+      This email address is unmonitored, please do not reply to it , your message will not reach anyone. </p>
   </body>
   
   </html>`;

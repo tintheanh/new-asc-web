@@ -16,7 +16,7 @@ class SingleViewAppointment extends React.Component<any, any> {
 
 	_fetch = () => {
 		const { fetchTutors, selectedSubject, dates } = this.props;
-		fetchTutors(selectedSubject.value, dates);
+		if (selectedSubject) fetchTutors(selectedSubject.value, dates);
 	};
 
 	render() {

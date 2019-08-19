@@ -1,5 +1,6 @@
 import { fbdb, fsdb } from 'index';
 import { TutorActionTypes, ActionPayload } from './types';
+import { timeStringToFloat } from 'utils/functions';
 
 export const selectType = (type: string) => (dispatch: (arg: ActionPayload) => void) => {
 	dispatch({
@@ -15,15 +16,68 @@ export const selectType = (type: string) => (dispatch: (arg: ActionPayload) => v
 	});
 };
 
+const isOverlapOffTimes = (off_times: any[], date: Date) => {
+	const unix = Math.floor(date.getTime() / 1000);
+	for (const time of off_times) {
+		if (unix >= time.from && unix <= time.to) {
+			return true;
+		}
+	}
+	return false;
+};
+
 export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch: (arg: ActionPayload) => void) => {
 	try {
-		const tutorsWithSubject = await fsdb.collection('tutors').where('subjects', 'array-contains', subjectId).get();
+		const tutorsWithSubject = await fsdb
+			.collection('tutors')
+			.where('subjects', 'array-contains', subjectId)
+			.where('active', '==', true)
+			.get();
+		// console.log(dates);
 		const tutorsInDate = await Promise.all(
 			dates.map(async (date) => {
 				const tutorIds = await Promise.all(
 					tutorsWithSubject.docs.map(async (tutor) => {
 						const tutorRef = await fbdb.ref(`tutors/${tutor.id}`).once('value');
-						if (tutorRef.val().work_schedule[date.getDay()] !== 'none') {
+						const tutorData = tutorRef.val();
+						let off_times: any[] = [];
+						if (tutorData.off_time) {
+							off_times = Object.keys(tutorData.off_time).map(
+								(key: string) => tutorData.off_time[key]
+							);
+							// console.log(off_times);
+						} else {
+							off_times = [];
+						}
+						if (tutorData.work_schedule[date.getDay()] !== 'none' && !isOverlapOffTimes(off_times, date)) {
+							// console.log(
+							// 	timeStringToFloat(
+							// 		tutorRef.val().work_schedule[date.getDay()][
+							// 			tutorRef.val().work_schedule[date.getDay()].length - 1
+							// 		].to.time
+							// 	)
+							// );
+							// if (
+							// 	dates[0].getDay() === new Date().getDay() &&
+							// 	timeStringToFloat(new Date().toLocaleTimeString('en-US')) >
+							// 		timeStringToFloat(
+							// 			tutorRef.val().work_schedule[date.getDay()][
+							// 				tutorRef.val().work_schedule[date.getDay()].length - 1
+							// 			].to.time
+							// 		) -
+							// 			0.5
+							// ) {
+							// 	console.log('yes', timeStringToFloat(new Date().toLocaleTimeString('en-US')));
+							// 	return null;
+							// }
+
+							// if (
+							// 	dates[0].getDay() === new Date().getDay() &&
+							// 	timeStringToFloat(new Date().toLocaleTimeString('en-US')) >
+							// 		timeStringToFloat(workDay[workDay.length - 1].to.time)
+							// ) {
+
+							// }
 							const processWorkSchedule = tutorRef.val().work_schedule.map((workDay: any) => {
 								if (workDay !== 'none') {
 									return workDay.map((shift: any) => {

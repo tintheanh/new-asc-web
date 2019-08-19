@@ -4,6 +4,9 @@ export enum AuthActionTypes {
 	LOGOUT_SUCCESS = '@@auth/LOGOUT_SUCCESS',
 	LOGOUT_FAILURE = '@@auth/LOGOUT_FAILURE',
 
+	FETCH_APPOINTMENT_SUCCESS = '@@auth/FETCH_APPOINTMENT_SUCCESS',
+	FETCH_APPOINTMENT_FAILURE = '@@auth/FETCH_APPOINTMENT_FAILURE',
+
 	MAKE_APPOINTMENT_SUCCESS = '@@auth/MAKE_APPOINTMENT_SUCCESS',
 	MAKE_APPOINTMENT_FAILURE = '@@auth/MAKE_APPOINTMENT_FAILURE',
 
@@ -20,6 +23,7 @@ export enum AuthActionTypes {
 export interface AuthState {
 	data: {
 		profile: any;
+		appointments: any[];
 		selectedAppointment: any,
 		reasonToDeleteAppt: string;
 	};

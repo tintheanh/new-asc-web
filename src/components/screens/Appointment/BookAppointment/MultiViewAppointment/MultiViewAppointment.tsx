@@ -29,10 +29,11 @@ class MultiViewAppointment extends React.Component<any, any> {
 
 	render() {
 		const { selectedSubject, selectedTutor } = this.props;
+		console.log(this.props.datesWithTutors);
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
-					<h3>{`Subject selected: ${selectedSubject.label}`}</h3>
+					{selectedSubject ? <h3>{`Subject selected: ${selectedSubject.label}`}</h3> : null}
 					<div className={styles.datePickWrapper} style={{ marginBottom: 8 }}>
 						<div className={styles.datePick}>
 							<p>From</p>

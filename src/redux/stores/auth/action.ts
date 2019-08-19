@@ -5,8 +5,8 @@ import { timeStringToFloat } from 'utils/functions';
 const getIndex = (arr: any[], time: any) => {
 	for (let i = 0; i < arr.length; i++) {
 		if (
-			timeStringToFloat(time.from) >= timeStringToFloat(arr[i].from) &&
-			timeStringToFloat(time.to) <= timeStringToFloat(arr[i].to)
+			timeStringToFloat(time.from) >= timeStringToFloat(arr[i].from.time) &&
+			timeStringToFloat(time.to) <= timeStringToFloat(arr[i].to.time)
 		) {
 			return i;
 		}
@@ -25,7 +25,9 @@ const getShift = (workDay: any[], appt_id: string) => {
 	return -1;
 };
 
-export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: ActionPayload) => void) => {
+export const makeAppointment = (data: any, profile: any, appointments: any[]) => (
+	dispatch: (arg: ActionPayload) => void
+) => {
 	return new Promise((resolve, reject) => {
 		const newKey = fbdb.ref('appointments').push().key;
 		if (newKey) {
@@ -62,21 +64,12 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 									}
 								)
 									.then((_) => {
-										const newProfile = { ...profile };
-										const newAppointment = {
-											id: newKey,
-											student_id: data.appointment.student_id,
-											tutor: data.tutor.name,
-											tutor_id: data.appointment.tutor_id,
-											subject: data.subject.label,
-											apptDate: data.appointment.apptDate
-										};
-										newProfile.appointments.push(newAppointment);
 										dispatch({
 											type: AuthActionTypes.MAKE_APPOINTMENT_SUCCESS,
 											payload: {
 												data: {
-													profile: newProfile,
+													profile: null,
+													appointments: [],
 													selectedAppointment: null,
 													reasonToDeleteAppt: ''
 												},
@@ -91,6 +84,7 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 											payload: {
 												data: {
 													profile: null,
+													appointments: [],
 													selectedAppointment: null,
 													reasonToDeleteAppt: ''
 												},
@@ -106,6 +100,7 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 									payload: {
 										data: {
 											profile: null,
+											appointments: [],
 											selectedAppointment: null,
 											reasonToDeleteAppt: ''
 										},
@@ -120,6 +115,7 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 							payload: {
 								data: {
 									profile: null,
+									appointments: [],
 									selectedAppointment: null,
 									reasonToDeleteAppt: ''
 								},
@@ -135,6 +131,7 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 						payload: {
 							data: {
 								profile: null,
+								appointments: [],
 								selectedAppointment: null,
 								reasonToDeleteAppt: ''
 							},
@@ -149,6 +146,7 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 				payload: {
 					data: {
 						profile: null,
+						appointments: [],
 						selectedAppointment: null,
 						reasonToDeleteAppt: ''
 					},
@@ -160,6 +158,75 @@ export const makeAppointment = (data: any, profile: any) => (dispatch: (arg: Act
 	});
 };
 
+export const fetchAppointment = (uid: string) => async (dispatch: (arg: ActionPayload) => void) => {
+	try {
+		const appointmentSnapshot = await fbdb.ref('appointments').once('value');
+		const apptObj = appointmentSnapshot.val();
+
+		if (apptObj) {
+			const appts = await Promise.all(
+				Object.keys(apptObj).map(async (key) => {
+					const [ tutorRef, subjectRef ] = await Promise.all([
+						fsdb.collection('tutors').doc(apptObj[key].tutor_id).get(),
+						fsdb.collection('subjects').doc(apptObj[key].subject_id).get()
+					]);
+					return {
+						id: key,
+						student_id: apptObj[key].student_id,
+						tutor: `${tutorRef.data()!.first_name} ${tutorRef.data()!.last_name}`,
+						tutor_id: apptObj[key].tutor_id,
+						tutorEmail: tutorRef.data()!.email,
+						subject: `${subjectRef.data()!.label} - ${subjectRef.data()!.full}`,
+						apptDate: apptObj[key].apptDate,
+						time: apptObj[key].time
+					};
+				})
+			);
+
+			const studentAppts = appts.filter((appt: any) => appt.student_id === uid);
+			console.log(studentAppts);
+			dispatch({
+				type: AuthActionTypes.FETCH_APPOINTMENT_SUCCESS,
+				payload: {
+					data: {
+						profile: null,
+						appointments: studentAppts,
+						selectedAppointment: null,
+						reasonToDeleteAppt: ''
+					},
+					error: ''
+				}
+			});
+		} else {
+			dispatch({
+				type: AuthActionTypes.FETCH_APPOINTMENT_FAILURE,
+				payload: {
+					data: {
+						profile: null,
+						appointments: [],
+						selectedAppointment: null,
+						reasonToDeleteAppt: ''
+					},
+					error: 'Error occurred.'
+				}
+			});
+		}
+	} catch (err) {
+		dispatch({
+			type: AuthActionTypes.FETCH_APPOINTMENT_FAILURE,
+			payload: {
+				data: {
+					profile: null,
+					appointments: [],
+					selectedAppointment: null,
+					reasonToDeleteAppt: ''
+				},
+				error: err.message
+			}
+		});
+	}
+};
+
 export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) => {
 	return new Promise((resolve, reject) => {
 		if (uid.length) {
@@ -169,37 +236,7 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 					const user = auth.currentUser;
 					if (user) {
 						try {
-							const [ studentRef, appointmentRef ] = await Promise.all([
-								fsdb.collection('students').doc(user.uid).get(),
-								fbdb.ref('appointments').once('value')
-							]);
-							const apptObj = appointmentRef.val();
-							let studentAppts: any[];
-							if (apptObj) {
-								const appts = await Promise.all(
-									Object.keys(apptObj).map(async (key) => {
-										const [ tutorRef, subjectRef ] = await Promise.all([
-											fsdb.collection('tutors').doc(apptObj[key].tutor_id).get(),
-											fsdb.collection('subjects').doc(apptObj[key].subject_id).get()
-										]);
-										return {
-											id: key,
-											student_id: apptObj[key].student_id,
-											tutor: `${tutorRef.data()!.first_name} ${tutorRef.data()!.last_name}`,
-											tutor_id: apptObj[key].tutor_id,
-											tutorEmail: tutorRef.data()!.email,
-											subject: `${subjectRef.data()!.label} - ${subjectRef.data()!.full}`,
-											apptDate: apptObj[key].apptDate,
-											time: apptObj[key].time
-										};
-									})
-								);
-
-								studentAppts = appts.filter((appt: any) => appt.student_id === user.uid);
-								console.log(studentAppts);
-							} else {
-								studentAppts = [];
-							}
+							const studentRef = await fsdb.collection('students').doc(user.uid).get();
 							const data = studentRef.data();
 
 							if (studentRef.exists && data) {
@@ -208,14 +245,14 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 									email: data.email,
 									first_name: data.first_name,
 									last_name: data.last_name,
-									studentId: data.studentId,
-									appointments: studentAppts
+									studentId: data.studentId
 								};
 								dispatch({
 									type: AuthActionTypes.LOGIN_SUCCESS,
 									payload: {
 										data: {
 											profile: profile,
+											appointments: [],
 											selectedAppointment: null,
 											reasonToDeleteAppt: ''
 										},
@@ -229,6 +266,7 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 									payload: {
 										data: {
 											profile: null,
+											appointments: [],
 											selectedAppointment: null,
 											reasonToDeleteAppt: ''
 										},
@@ -243,6 +281,7 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 								payload: {
 									data: {
 										profile: null,
+										appointments: [],
 										selectedAppointment: null,
 										reasonToDeleteAppt: ''
 									},
@@ -257,6 +296,7 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 							payload: {
 								data: {
 									profile: null,
+									appointments: [],
 									selectedAppointment: null,
 									reasonToDeleteAppt: ''
 								},
@@ -272,6 +312,7 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 						payload: {
 							data: {
 								profile: null,
+								appointments: [],
 								selectedAppointment: null,
 								reasonToDeleteAppt: ''
 							},
@@ -286,6 +327,7 @@ export const login = (uid: string) => (dispatch: (arg: ActionPayload) => void) =
 				payload: {
 					data: {
 						profile: null,
+						appointments: [],
 						selectedAppointment: null,
 						reasonToDeleteAppt: ''
 					},
@@ -306,6 +348,7 @@ export const logout = () => (dispatch: (arg: ActionPayload) => void) => {
 				payload: {
 					data: {
 						profile: null,
+						appointments: [],
 						selectedAppointment: null,
 						reasonToDeleteAppt: ''
 					},
@@ -319,6 +362,7 @@ export const logout = () => (dispatch: (arg: ActionPayload) => void) => {
 				payload: {
 					data: {
 						profile: null,
+						appointments: [],
 						selectedAppointment: null,
 						reasonToDeleteAppt: ''
 					},
@@ -334,6 +378,7 @@ export const selectAppointment = (appointment: any) => (dispatch: (arg: ActionPa
 		payload: {
 			data: {
 				profile: null,
+				appointments: [],
 				selectedAppointment: appointment,
 				reasonToDeleteAppt: ''
 			},
@@ -348,6 +393,7 @@ export const inputReason = (reason: any) => (dispatch: (arg: ActionPayload) => v
 		payload: {
 			data: {
 				profile: null,
+				appointments: [],
 				selectedAppointment: null,
 				reasonToDeleteAppt: reason
 			},
@@ -357,7 +403,7 @@ export const inputReason = (reason: any) => (dispatch: (arg: ActionPayload) => v
 };
 
 export const deleteAppointment = (data: any) => (dispatch: (arg: ActionPayload) => void) => {
-	const { thingToDelete, profile, forEmail } = data;
+	const { thingToDelete, oldAppointments, forEmail } = data;
 	const { tutor_id, appt_id, day } = thingToDelete;
 
 	fbdb.ref(`appointments/${appt_id}`).remove().then(async () => {
@@ -378,17 +424,17 @@ export const deleteAppointment = (data: any) => (dispatch: (arg: ActionPayload) 
 						body: JSON.stringify(forEmail)
 					})
 						.then((_) => {
-							const newProfile = { ...profile };
-							const filtered = newProfile.appointments.filter(
+							const appointments = [ ...oldAppointments ];
+							const newAppointments = appointments.filter(
 								(appt: any) => appt.id !== thingToDelete.appt_id
 							);
-							newProfile.appointments = filtered;
 
 							dispatch({
 								type: AuthActionTypes.DELETE_APPOINTMENT_SUCCESS,
 								payload: {
 									data: {
-										profile: newProfile,
+										profile: null,
+										appointments: newAppointments,
 										selectedAppointment: null,
 										reasonToDeleteAppt: ''
 									},
@@ -402,6 +448,7 @@ export const deleteAppointment = (data: any) => (dispatch: (arg: ActionPayload) 
 								payload: {
 									data: {
 										profile: null,
+										appointments: [],
 										selectedAppointment: null,
 										reasonToDeleteAppt: ''
 									},
@@ -416,6 +463,7 @@ export const deleteAppointment = (data: any) => (dispatch: (arg: ActionPayload) 
 						payload: {
 							data: {
 								profile: null,
+								appointments: [],
 								selectedAppointment: null,
 								reasonToDeleteAppt: ''
 							},
@@ -429,6 +477,7 @@ export const deleteAppointment = (data: any) => (dispatch: (arg: ActionPayload) 
 				payload: {
 					data: {
 						profile: null,
+						appointments: [],
 						selectedAppointment: null,
 						reasonToDeleteAppt: ''
 					},
@@ -445,6 +494,7 @@ export const clearAuthStore = () => (dispatch: (arg: ActionPayload) => void) => 
 		payload: {
 			data: {
 				profile: null,
+				appointments: [],
 				selectedAppointment: null,
 				reasonToDeleteAppt: ''
 			},
@@ -459,6 +509,7 @@ export const clearError = () => (dispatch: (arg: ActionPayload) => void) => {
 		payload: {
 			data: {
 				profile: null,
+				appointments: [],
 				selectedAppointment: null,
 				reasonToDeleteAppt: ''
 			},

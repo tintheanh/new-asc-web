@@ -22,13 +22,13 @@ class AppointmentTable extends React.Component<any, any> {
 				accessor: (d: any) => convertTimestamp(d.apptDate)
 			}
 		];
-		const { profile, selectedAppointment } = this.props;
+		const { appointments, selectedAppointment } = this.props;
 		return (
 			<ReactTable
 				style={{ cursor: 'pointer' }}
 				columns={columns}
 				defaultPageSize={10}
-				data={profile.appointments}
+				data={appointments}
 				noDataText="No appointments found."
 				defaultSorted={[
 					{
@@ -61,7 +61,7 @@ class AppointmentTable extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
-	profile: state.auth.data.profile,
+	appointments: state.auth.data.appointments,
 	selectedAppointment: state.auth.data.selectedAppointment
 });
 
