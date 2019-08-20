@@ -1,4 +1,5 @@
 import * as React from 'react';
+import moment from 'moment';
 import Modal from 'react-modal';
 import { connect } from 'react-redux';
 import { floatToTime } from 'utils/functions';
@@ -15,6 +16,8 @@ class Hour extends React.Component<any, any> {
 	};
 
 	checkVacancy = (hr: any) => {
+		let vacancyCurrent = true;
+		let vacancyAppt = true;
 		const { data } = this.props;
 		const timeString = floatToTime(hr);
 		const pickedMonth = data.date.getMonth();
@@ -26,18 +29,38 @@ class Hour extends React.Component<any, any> {
 						const apptMonth = new Date(appt.date * 1000).getMonth();
 						const apptDate = new Date(appt.date * 1000).getDate();
 						if (pickedMonth === apptMonth && pickedDate === apptDate) {
-							return false;
+							vacancyAppt = false;
+							break;
 						}
 					}
 				}
 			}
 		}
 
-		return true;
+		const currentMoment = Math.floor(new Date().getTime() / 1000);
+		// console.log(currentMoment);
+
+		let vacancyOff = true;
+		const currentMomentOfHour = Number(
+			moment(`${data.date.toLocaleDateString('en-US')} ${timeString}`, 'M/D/YYYY hh:mm A').format('X')
+		);
+		if (currentMomentOfHour < currentMoment) {
+			vacancyCurrent = false;
+		}
+		// console.log(currentMomentOfHour);
+		for (const time of data.tutor.off_time) {
+			if (currentMomentOfHour >= time.from && currentMomentOfHour <= time.to) {
+				vacancyOff = false;
+				break;
+			}
+		}
+		if (vacancyAppt && vacancyCurrent && vacancyOff) return true;
+		return false;
 	};
 
 	render() {
 		const { hour, data } = this.props;
+		// console.log(data);
 		return (
 			<div>
 				{this.checkVacancy(hour) ? (

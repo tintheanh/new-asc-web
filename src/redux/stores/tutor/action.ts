@@ -40,16 +40,19 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 					tutorsWithSubject.docs.map(async (tutor) => {
 						const tutorRef = await fbdb.ref(`tutors/${tutor.id}`).once('value');
 						const tutorData = tutorRef.val();
-						let off_times: any[] = [];
-						if (tutorData.off_time) {
-							off_times = Object.keys(tutorData.off_time).map(
-								(key: string) => tutorData.off_time[key]
-							);
-							// console.log(off_times);
-						} else {
-							off_times = [];
-						}
-						if (tutorData.work_schedule[date.getDay()] !== 'none' && !isOverlapOffTimes(off_times, date)) {
+						const off_time = tutor
+							.data()
+							.off_time.map((time: any) => ({ from: time.from.seconds, to: time.to.seconds }));
+						// console.log(off_times);
+						// if (tutorData.off_time) {
+						// 	off_times = Object.keys(tutorData.off_time).map(
+						// 		(key: string) => tutorData.off_time[key]
+						// 	);
+						// 	// console.log(off_times);
+						// } else {
+						// 	off_times = [];
+						// }
+						if (tutorData.work_schedule[date.getDay()] !== 'none') {
 							// console.log(
 							// 	timeStringToFloat(
 							// 		tutorRef.val().work_schedule[date.getDay()][
@@ -102,7 +105,8 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 								uid: tutor.id,
 								name: `${tutor.data().first_name} ${tutor.data().last_name}`,
 								email: tutor.data().email,
-								work_schedule: processWorkSchedule
+								work_schedule: processWorkSchedule,
+								off_time
 							};
 							return finalTutor;
 						}
@@ -117,6 +121,7 @@ export const fetchTutors = (subjectId: string, dates: Date[]) => async (dispatch
 				};
 			})
 		);
+		console.log(tutorsInDate);
 		dispatch({
 			type: TutorActionTypes.FETCH_TUTOR_SUCCESS,
 			payload: {

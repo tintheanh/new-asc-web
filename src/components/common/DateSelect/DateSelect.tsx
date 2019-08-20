@@ -22,6 +22,8 @@ class DateSelect extends React.Component<any, any> {
 	};
 
 	render() {
+		// console.log(this.props.profile);
+		// console.log(new Date(new Date().getTime() + this.props.profile.settings.weeks_allow * 7 * 8.64e7));
 		const { type, dates, hasMax } = this.props;
 		return (
 			<DatePicker
@@ -30,7 +32,15 @@ class DateSelect extends React.Component<any, any> {
 				className={styles.datePicker}
 				todayButton={'Select Today'}
 				minDate={type === 'day1' ? new Date() : dates[0]}
-				maxDate={type === 'day1' ? hasMax ? dates[dates.length - 1] : null : null}
+				maxDate={
+					type === 'day1' ? hasMax ? (
+						dates[dates.length - 1]
+					) : (
+						new Date(new Date().getTime() + this.props.weeks_allow * 7 * 8.64e7)
+					) : (
+						new Date(new Date().getTime() + this.props.weeks_allow * 7 * 8.64e7)
+					)
+				}
 				dateFormat="eee, MMM d yyyy"
 			/>
 		);
@@ -38,6 +48,7 @@ class DateSelect extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
+	profile: state.auth.data.profile,
 	dates: state.date.data.dates,
 	selectedSubject: state.subject.data.selectedSubject
 });

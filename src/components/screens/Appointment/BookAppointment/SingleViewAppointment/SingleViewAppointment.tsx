@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { fetchTutors } from 'redux/stores/tutor/action';
+import { fetchAppointmentSettings } from 'redux/stores/settings/action';
 import { DateSelect, TutorBox } from 'components/common';
 
 class SingleViewAppointment extends React.Component<any, any> {
 	componentDidMount() {
+		this.props.fetchAppointmentSettings();
 		this._fetch();
 	}
 
@@ -20,14 +22,15 @@ class SingleViewAppointment extends React.Component<any, any> {
 	};
 
 	render() {
-		const { selectedSubject, datesWithTutors } = this.props;
+		const { selectedSubject, datesWithTutors, settings } = this.props;
+		console.log(settings);
 		return (
 			<div className="container">
 				<div className="box-form" style={{ width: '80%' }}>
 					{selectedSubject ? <h3>{`Subject selected: ${selectedSubject.label}`}</h3> : null}
 					<div style={{ width: '30%', marginBottom: 8 }}>
 						<p>Select a date</p>
-						<DateSelect noTo />
+						<DateSelect weeks_allow={settings ? settings.weeks_allow : 0} noTo />
 					</div>
 
 					{datesWithTutors.length ? datesWithTutors[0].tutors.length ? (
@@ -46,9 +49,10 @@ class SingleViewAppointment extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
+	settings: state.settings.data.appointmentSettings,
 	selectedSubject: state.subject.data.subject,
 	datesWithTutors: state.tutor.data.datesWithTutors,
 	dates: state.date.data.dates
 });
 
-export default connect(mapStateToProps, { fetchTutors })(SingleViewAppointment);
+export default connect(mapStateToProps, { fetchTutors, fetchAppointmentSettings })(SingleViewAppointment);

@@ -1,12 +1,16 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import {} from 'redux/stores/tutor/action';
+// import {} from 'redux/stores/tutor/action';
 import { DateSelect, TutorBox } from 'components/common';
+import { fetchAppointmentSettings } from 'redux/stores/settings/action';
 import { contains } from 'utils/functions';
 import TutorSelect from './TutorSelect/TutorSelect';
 import styles from './styles.module.css';
 
 class MultiViewAppointment extends React.Component<any, any> {
+	componentDidMount() {
+		this.props.fetchAppointmentSettings();
+	}
 	_filterDates = () => {
 		const { selectedTutor, datesWithTutors } = this.props;
 		if (selectedTutor) {
@@ -41,7 +45,7 @@ class MultiViewAppointment extends React.Component<any, any> {
 						</div>
 						<div className={styles.datePick}>
 							<p>To</p>
-							<DateSelect type="day2" />
+							<DateSelect weeks_allow={this.props.settings.weeks_allow} type="day2" />
 						</div>
 					</div>
 					<div className={styles.tutorSelect}>
@@ -64,9 +68,10 @@ class MultiViewAppointment extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
+	settings: state.settings.data.appointmentSettings,
 	selectedSubject: state.subject.data.subject,
 	datesWithTutors: state.tutor.data.datesWithTutors,
 	selectedTutor: state.tutor.data.selectedTutor
 });
 
-export default connect(mapStateToProps, {})(MultiViewAppointment);
+export default connect(mapStateToProps, { fetchAppointmentSettings })(MultiViewAppointment);
