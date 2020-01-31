@@ -1,7 +1,7 @@
 # Mission College Academic Support Center Appointment Website
 A website for making tutoring appointments for students, which is currently being used at Mission College Academic Support Center, Santa Clara, California
 
-![gif](https://i.imgur.com/Uxsqokx.gif)
+![screenshot](https://i.imgur.com/o0dVuVz.png)
 
 ## Features:
 * Make appointments based on subjects and/or availability
@@ -12,6 +12,7 @@ A website for making tutoring appointments for students, which is currently bein
 * Typescript
 * React
 * Redux
+* Bootstrap
 * Firebase real-time database
 * Firebase authentication
 * Firestore
