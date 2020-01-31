@@ -8,7 +8,7 @@ A website for making tutoring appointments for students, which is currently bein
 * Delete appointment by student
 * Email reminder for both student and tutor
 
-## Technology uses:
+## Technologies use:
 * Typescript
 * React
 * Redux
